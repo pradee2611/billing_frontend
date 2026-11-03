@@ -16,7 +16,7 @@ export default function LoginPage({ onLogin }) {
       await login(username.trim(), password);
       onLogin();
     } catch (err) {
-      setError(err.message === "Failed to fetch" ? "Could not reach the server. Is the backend running?" : err.message);
+      setError(err.message);
       setBusy(false);
     }
   };

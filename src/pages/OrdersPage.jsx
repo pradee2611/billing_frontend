@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteOrder, getOrderGroups } from "../api/client.js";
+import { MAINTENANCE_TEXT, deleteOrder, getOrderGroups } from "../api/client.js";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import OrderDateGroup from "../components/OrderDateGroup.jsx";
 import OrderDetailsModal from "../components/OrderDetailsModal.jsx";
@@ -65,8 +65,8 @@ export default function OrdersPage() {
       await deleteOrder(deleting.id);
       closeDelete();
       setVersion((v) => v + 1);
-    } catch {
-      setDeleteError("Could not delete the bill. Check the backend and try again.");
+    } catch (err) {
+      setDeleteError(err.down ? MAINTENANCE_TEXT : "Could not delete the bill. Please try again.");
     } finally {
       setDeleteBusy(false);
     }

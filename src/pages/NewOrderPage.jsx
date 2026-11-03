@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { createOrder, getOrder, getProducts, updateOrder } from "../api/client.js";
+import { MAINTENANCE_TEXT, createOrder, getOrder, getProducts, updateOrder } from "../api/client.js";
 import BillModal from "../components/BillModal.jsx";
 import CartSidebar from "../components/CartSidebar.jsx";
 import CategoryChips from "../components/CategoryChips.jsx";
@@ -90,8 +90,8 @@ export default function NewOrderPage() {
     try {
       setReceipt(editing ? await updateOrder(id, payload()) : await createOrder(payload()));
       setConfirming(false);
-    } catch {
-      setSubmitError(true);
+    } catch (err) {
+      setSubmitError(err.down ? "down" : true);
     } finally {
       setSubmitting(false);
     }
@@ -202,7 +202,7 @@ export default function NewOrderPage() {
           title={`Save changes to ${original.number}?`}
           confirmLabel="Yes, save changes"
           busy={submitting}
-          error={submitError ? "Could not save the bill. Check the backend and try again." : ""}
+          error={submitError === "down" ? MAINTENANCE_TEXT : submitError ? "Could not save the bill. Please try again." : ""}
           onConfirm={save}
           onCancel={() => { setConfirming(false); setSubmitError(false); }}
         >

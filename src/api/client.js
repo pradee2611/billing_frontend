@@ -19,12 +19,25 @@ async function fetchWithWake(url, options) {
   }
 }
 
+export const MAINTENANCE_TEXT = "We're under maintenance. Please try again in a minute.";
+
+function serverDown(cause) {
+  const error = new Error(MAINTENANCE_TEXT, { cause });
+  error.down = true;
+  return error;
+}
+
 async function request(path, options = {}) {
   const token = getToken();
-  const response = await fetchWithWake(`/api${path}`, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...(token && { Authorization: `Bearer ${token}` }) },
-  });
+  let response;
+  try {
+    response = await fetchWithWake(`/api${path}`, {
+      ...options,
+      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Bearer ${token}` }) },
+    });
+  } catch (cause) {
+    throw serverDown(cause);
+  }
   if (response.status === 401) {
     // Token missing, expired or rejected: send the user back to the login screen.
     clearToken();
@@ -33,17 +46,24 @@ async function request(path, options = {}) {
   if (!response.ok) {
     const error = new Error(`Request failed (${response.status})`);
     error.status = response.status;
+    error.down = WAKE_STATUSES.includes(response.status);
     throw error;
   }
   return response.status === 204 ? null : response.json();
 }
 
 export async function login(username, password) {
-  const response = await fetch("/api/auth/login/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
+  let response;
+  try {
+    response = await fetch("/api/auth/login/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+  } catch (cause) {
+    throw serverDown(cause);
+  }
+  if (WAKE_STATUSES.includes(response.status)) throw serverDown();
   if (response.status === 429) throw new Error("Too many attempts. Wait a minute and try again.");
   if (!response.ok) throw new Error("Wrong username or password.");
   setToken((await response.json()).token);
