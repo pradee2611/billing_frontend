@@ -31,8 +31,8 @@ export default function OrderDateGroup({ date, orders, onView, onEdit, onDelete 
               <th className="d-none d-sm-table-cell">Time</th>
               <th>Customer</th>
               <th className="d-none d-sm-table-cell">Payment</th>
-              <th className="text-end d-none d-sm-table-cell">Items</th>
-              <th className="text-end">Total</th>
+              <th>Items</th>
+              <th className="text-end">Paid</th>
               <th />
             </tr>
           </thead>
@@ -49,9 +49,17 @@ export default function OrderDateGroup({ date, orders, onView, onEdit, onDelete 
                   {order.customer_phone && <div className="small text-secondary num">{order.customer_phone}</div>}
                 </td>
                 <td className="d-none d-sm-table-cell"><span className={`pill pill-${order.payment_mode.toLowerCase()}`}>{paymentLabel(order.payment_mode)}</span></td>
-                <td className="num text-end d-none d-sm-table-cell">{order.item_count}</td>
+                <td className="small lh-sm order-items">
+                  {(order.lines ?? []).map((line, i) => (
+                    <div key={i}>{line.name} × {line.quantity}</div>
+                  ))}
+                  <div className="text-secondary">{order.item_count} pcs</div>
+                </td>
                 <td className="num text-end fw-semibold lh-sm">
                   {formatMoney(order.payable)}
+                  {order.payment_mode === "SPLIT" && (
+                    <div className="small fw-normal text-secondary">Cash {formatMoney(order.cash_amount)} + GPay {formatMoney(order.gpay_amount)}</div>
+                  )}
                   {Number(order.less_amount) > 0 && <div className="small fw-normal text-secondary">less {formatMoney(order.less_amount)}</div>}
                 </td>
                 <td className="text-end row-actions">
