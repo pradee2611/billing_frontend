@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://billing-backend-kh2p.onrender.com/api/:path*" },
+    { "source": "/api/(.*)", "destination": "https://billing-backend-kh2p.onrender.com/api/$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
