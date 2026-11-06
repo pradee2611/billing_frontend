@@ -134,6 +134,8 @@ tr[role="button"] { cursor: pointer; }
 @media print {
   /* Remove (not just hide) everything except the bill, so the hidden app doesn't add blank pages. */
   body *:not(:has(.print-area)):not(.print-area):not(.print-area *) { display: none !important; }
+  /* Browser-extension widgets (floating buttons, side-panel handles) are injected next to #root or on <html>; keep them out of the bill. */
+  html > *:not(head):not(body), body > *:not(#root):not(script) { display: none !important; }
   html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
   .modal, .modal-dialog, .modal-content, .modal-body { position: static !important; display: block !important; overflow: visible !important; max-width: none !important; height: auto !important; margin: 0 !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; }
   .print-area { width: 100%; padding: 0; }
