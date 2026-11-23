@@ -8,6 +8,7 @@ import PageHeader from "../components/PageHeader.jsx";
 import SearchBar from "../components/SearchBar.jsx";
 import StatusMessage from "../components/StatusMessage.jsx";
 import useAsync from "../hooks/useAsync.js";
+import { customerRows, printCustomerReport } from "../utils/customerReport.js";
 import { formatMoney, paymentLabel, SHEET_URL, sumBy, todayIso } from "../utils/format.js";
 
 const FILTERS = [["ALL", "All"], ["CASH", "Cash"], ["GPAY", "GPay"], ["SPLIT", "Split"]];
@@ -75,6 +76,14 @@ export default function OrdersPage() {
   return (
     <>
       <PageHeader title="Orders" subtitle="Every bill, grouped by day">
+        <button
+          className="btn btn-outline-secondary"
+          disabled={!customerRows(groups).length}
+          title="PDF of bills that have a customer name or phone"
+          onClick={() => printCustomerReport(groups)}
+        >
+          📄 Customers PDF
+        </button>
         {SHEET_URL && <a href={SHEET_URL} target="_blank" rel="noreferrer" className="btn btn-outline-success">Open Google Sheet ↗</a>}
         <Link to="/new" className="btn btn-primary">+ New bill</Link>
       </PageHeader>
